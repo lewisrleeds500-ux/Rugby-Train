@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FIFTEEN">
+<title>FIFTEEN</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--surf:#111;--surf2:#191919;--surf3:#222;
+  --bdr:#2c2c2c;--acc:#C5F135;--acc-d:rgba(197,241,53,.11);--acc-m:rgba(197,241,53,.32);
+  --txt:#fff;--txt2:#888;--txt3:#3a3a3a;
+  --red:#FF453A;--red-d:rgba(255,69,58,.13);
+  --yel:#FFD60A;--yel-d:rgba(255,214,10,.13);
+  --grn:#32D74B;--grn-d:rgba(50,215,75,.13);
+  --nav-h:76px;--st:env(safe-area-inset-top,20px);--sb:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column}
+.views{flex:1;overflow:hidden;position:relative}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(var(--st)+8px) 16px calc(var(--nav-h)+24px);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;-webkit-overflow-scrolling:touch}
+.view.on{opacity:1;pointer-events:all;transform:none}
+nav{height:var(--nav-h);padding-bottom:var(--sb);background:rgba(8,8,8,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bdr);display:flex;position:relative;z-index:100;flex-shrink:0}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--txt3);cursor:pointer;transition:color .18s;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.nb.on{color:var(--acc)}
+.nb svg{width:20px;height:20px}
+/* TYPOGRAPHY */
+.hd1{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;letter-spacing:.5px}
+.hd2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.3px;margin-bottom:10px}
+.hd3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.2px}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--txt2);text-transform:uppercase}
+.tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:4px;display:inline-block}
+.tag-a{background:var(--acc-d);color:var(--acc)}
+.tag-g{background:var(--grn-d);color:var(--grn)}
+.tag-r{background:var(--red-d);color:var(--red)}
+.tag-y{background:var(--yel-d);color:var(--yel)}
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;padding:16px;margin-bottom:12px}
+/* BUTTONS */
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:12px 18px;border-radius:12px;border:none;cursor:pointer;transition:all .14s;display:inline-flex;align-items:center;gap:8px}
+.btn-acc{background:var(--acc);color:#000}
+.btn-acc:active{transform:scale(.97)}
+.btn-ghost{background:var(--surf2);color:var(--txt);border:1px solid var(--bdr)}
+.btn-ghost:active{transform:scale(.97)}
+.btn-sm{padding:8px 12px;font-size:11px;border-radius:8px}
+.btn-full{width:100%;justify-content:center}
+.btn-danger{background:var(--red-d);color:var(--red);border:1px solid var(--red-d)}
+/* TAB BAR */
+.tabbar{display:flex;background:var(--surf);border-radius:12px;padding:3px;margin-bottom:14px;border:1px solid var(--bdr);gap:2px}
+.tbb{flex:1;padding:8px 4px;border:none;background:none;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--txt3);border-radius:9px;cursor:pointer;transition:all .16s}
+.tbb.on{background:var(--surf3);color:var(--txt)}
+/* CHECK ITEMS */
+.chk-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr);cursor:pointer;transition:opacity .18s;-webkit-user-select:none;user-select:none}
+.chk-row:last-child{border-bottom:none}
+.chk-row.done{opacity:.4}
+.chk-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;transition:all .16s;flex-shrink:0}
+.chk-row.done .chk-circle{background:var(--acc);border-color:var(--acc)}
+.chk-tick{color:#000;font-size:11px;opacity:0;transition:opacity .14s}
+.chk-row.done .chk-tick{opacity:1}
+/* PILLS */
+.pills{display:flex;overflow-x:auto;gap:6px;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--bdr);background:transparent;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--txt2);white-space:nowrap;cursor:pointer;transition:all .14s;flex-shrink:0}
+.pill.on{background:var(--acc);color:#000;border-color:var(--acc)}
+/* PROGRESS */
+.pbar{background:var(--surf3);border-radius:4px;height:4px;overflow:hidden}
+.pfill{height:100%;background:var(--acc);border-radius:4px;transition:width .35s ease}
+/* COUNTDOWN */
+.cd-card{background:linear-gradient(135deg,#0C1900,#162400);border:1px solid rgba(197,241,53,.25);border-radius:20px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+.cd-card::after{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(197,241,53,.1),transparent 70%);pointer-events:none}
+.cd-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--acc);line-height:.9}
+.cd-unit{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;color:rgba(197,241,53,.55);text-transform:uppercase;margin-top:4px}
+/* SESSION ACCORDION */
+.sess{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;margin-bottom:10px;transition:border-color .18s}
+.sess.open{border-color:rgba(197,241,53,.28)}
+.sess-hdr{padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px}
+.sess-letter{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--acc);line-height:1;width:32px;flex-shrink:0}
+.sess-info{flex:1}
+.sess-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--acc);text-transform:uppercase;margin-bottom:2px}
+.sess-name{font-size:14px;font-weight:600}
+.sess-chev{color:var(--txt3);transition:transform .18s;flex-shrink:0}
+.sess.open .sess-chev{transform:rotate(180deg)}
+.sess-body{padding:0 14px 14px;display:none}
+.sess.open .sess-body{display:block}
+.sess-focus{background:var(--surf2);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:13px;color:var(--txt2);line-height:1.55}
+.nut-box{background:rgba(197,241,53,.05);border:1px solid rgba(197,241,53,.14);border-radius:10px;padding:10px 13px;margin-top:12px;font-size:13px;color:var(--txt2);line-height:1.7}
+.nut-box strong{color:var(--acc)}
+.blk-hdr{display:flex;align-items:center;gap:8px;padding:10px 0 5px;margin-top:4px}
+.blk-name{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.blk-line{flex:1;height:1px;background:var(--surf3)}
+.ex-row{padding:11px 0;border-bottom:1px solid var(--bdr)}
+.ex-row:last-child{border-bottom:none}
+.ex-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.ex-meta{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--txt2);margin-bottom:6px}
+.ex-note{font-size:11px;color:var(--txt3);font-style:italic}
+.sets-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.set-btn{width:34px;height:34px;border-radius:7px;border:2px solid var(--bdr);background:transparent;color:var(--txt3);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .14s;display:flex;align-items:center;justify-content:center}
+.set-btn.done{background:var(--acc);border-color:var(--acc);color:#000}
+/* FILM CARDS */
+.vc{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;margin-bottom:8px}
+.vc-hdr{padding:12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.vc-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--txt3);line-height:1;min-width:28px;flex-shrink:0}
+.vc-info{flex:1;min-width:0}
+.vc-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:3px}
+.vc-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2)}
+.vc-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.vc-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:all .14s}
+.vc-dot.w{background:var(--grn);border-color:var(--grn)}
+.vc-dot.r{background:var(--yel);border-color:var(--yel)}
+.vc-body{padding:0 12px 12px;display:none}
+.vc.open .vc-body{display:block}
+.wc-row{font-size:12px;color:var(--txt2);padding:5px 0;border-bottom:1px solid var(--bdr);display:flex;gap:8px;line-height:1.5}
+.wc-row::before{content:'→';color:var(--acc);font-size:10px;flex-shrink:0;margin-top:2px}
+.wc-row:last-child{border-bottom:none}
+.yt-link{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:9px;background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;color:var(--txt);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-top:10px}
+.insight-box{background:var(--surf2);border-radius:8px;padding:8px 10px;margin-top:8px}
+.insight-box textarea{background:transparent;border:none;font-size:12px;color:var(--txt2);width:100%;resize:none;outline:none;font-family:'Barlow',sans-serif;min-height:60px}
+/* VISUALISATION */
+.scr-card{background:var(--surf);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;margin-bottom:10px}
+.scr-hdr{padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.scr-chev{color:var(--txt3);transition:transform .18s;flex-shrink:0}
+.scr-card.open .scr-chev{transform:rotate(180deg)}
+.scr-body{padding:0 14px 14px;display:none}
+.scr-card.open .scr-body{display:block}
+.scr-text{font-size:15px;line-height:1.9;color:var(--txt2);white-space:pre-line}
+/* BREATHING */
+.breath-wrap{display:flex;flex-direction:column;align-items:center;padding:24px 0 16px}
+.bc-ring{width:200px;height:200px;position:relative;margin-bottom:24px}
+.bc{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(197,241,53,.12),rgba(197,241,53,.02));border:2px solid rgba(197,241,53,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .6s cubic-bezier(.4,0,.2,1),border-color .6s,background .6s}
+.bc.expand{transform:scale(1.3);border-color:rgba(197,241,53,.7);background:radial-gradient(circle,rgba(197,241,53,.25),rgba(197,241,53,.05))}
+.bc.hold-big{transform:scale(1.3);border-color:rgba(197,241,53,.4)}
+.bc.contract{transform:scale(1);border-color:rgba(197,241,53,.16);background:radial-gradient(circle,rgba(197,241,53,.06),transparent)}
+.bc-num{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--acc);line-height:1}
+.bc-phase{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;color:rgba(197,241,53,.6);text-transform:uppercase;margin-top:2px}
+.bc-type{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--txt3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;text-align:center}
+/* CUES */
+.cue-grp{margin-bottom:18px}
+.cue-title{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--acc);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.cue-item{background:var(--surf2);border-radius:10px;padding:11px 14px;margin-bottom:5px;font-size:14px;font-weight:500;border-left:3px solid var(--acc);line-height:1.4}
+/* PRE-GAME */
+.pg-phase{margin-bottom:18px}
+.pg-phase-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(197,241,53,.2)}
+/* MONITOR */
+.mon-opt{flex:1;padding:10px 5px;border-radius:10px;border:2px solid var(--bdr);text-align:center;cursor:pointer;transition:all .14s;background:transparent;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--txt2)}
+.mon-opt.sg{background:var(--grn-d);border-color:var(--grn);color:var(--grn)}
+.mon-opt.sy{background:var(--yel-d);border-color:var(--yel);color:var(--yel)}
+.mon-opt.sr{background:var(--red-d);border-color:var(--red);color:var(--red)}
+.scale-row{display:flex;gap:5px}
+.sc-btn{flex:1;padding:10px 0;border-radius:8px;border:2px solid var(--bdr);background:transparent;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--txt3);cursor:pointer;transition:all .14s}
+.sc-btn.sel{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
+/* RECOVERY STEPS */
+.rec-step{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .18s}
+.rec-step.cur{border-color:var(--acc);background:rgba(197,241,53,.04)}
+.rec-step.fin{opacity:.35}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--txt3);width:28px;text-align:center;flex-shrink:0}
+.rec-step.cur .step-num{color:var(--acc)}
+.step-info{flex:1}
+.step-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.step-dur{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--txt2)}
+.step-tip{font-size:12px;color:var(--txt2);margin-top:5px;line-height:1.45;display:none}
+.rec-step.cur .step-tip{display:block}
+.step-timer{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);background:var(--acc-d);border:none;border-radius:8px;padding:7px 10px;cursor:pointer;min-width:52px;text-align:center;flex-shrink:0}
+/* KICKING LOG */
+.kle{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
+.kle-pct{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--acc);min-width:46px}
+.kle-det{flex:1}
+.kle-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--txt2);margin-bottom:2px}
+.kle-type{font-size:13px;font-weight:500}
+.kle-note{font-size:11px;color:var(--txt3);margin-top:2px}
+/* PB CARDS */
+.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.pb-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:13px;text-align:center}
+.pb-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--acc);line-height:1}
+.pb-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:var(--txt2);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+/* FORM */
+.fg{margin-bottom:12px}
+.fl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2);margin-bottom:5px;display:block}
+select,input[type=number],input[type=text]{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;color:var(--txt);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;padding:10px 12px;width:100%;outline:none;-webkit-appearance:none;appearance:none}
+select:focus,input:focus{border-color:var(--acc)}
+textarea{width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;color:var(--txt);font-family:'Barlow',sans-serif;font-size:13px;padding:9px 11px;resize:none;outline:none;min-height:70px}
+textarea:focus{border-color:var(--acc)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* QUICK GRID */
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.qb{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:14px;cursor:pointer;transition:border-color .14s;text-align:left;display:flex;flex-direction:column;gap:5px}
+.qb:active{border-color:var(--acc)}
+.qb-icon{font-size:20px}
+.qb-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.qb-sub{font-size:11px;color:var(--txt2)}
+/* WEEKLY */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
+.wd{aspect-ratio:1;border-radius:7px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;flex-direction:column;gap:1px}
+.wd-day{font-size:8px;color:var(--txt3);letter-spacing:.05em}
+.wd.has-g{background:var(--grn-d);color:var(--grn)}
+.wd.has-y{background:var(--yel-d);color:var(--yel)}
+.wd.has-r{background:var(--red-d);color:var(--red)}
+.wd.today-hl{border:2px solid var(--acc)}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h)+12px);left:50%;transform:translateX(-50%) translateY(14px);background:var(--surf3);border:1px solid var(--bdr);border-radius:20px;padding:9px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;z-index:999;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(8px)}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal{background:var(--surf);border-radius:24px 24px 0 0;width:100%;padding:20px 20px calc(20px + var(--sb));max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.modal-bg.show .modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 16px}
+/* DIVIDER */
+.dvd{height:1px;background:var(--bdr);margin:14px 0}
+/* FIELD */
+.field-sess{background:var(--surf2);border-radius:12px;padding:12px 14px;margin-bottom:9px;border-left:3px solid var(--acc)}
+.field-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);margin-bottom:2px}
+.field-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.field-desc{font-size:12px;color:var(--txt2);line-height:1.5}
+/* STATS ROW */
+.stats-row{display:flex;gap:8px;margin-bottom:12px}
+.stat-box{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:12px 10px;text-align:center}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--acc);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:var(--txt2);letter-spacing:.09em;text-transform:uppercase;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="views">
+    <div id="v-home" class="view on"></div>
+    <div id="v-train" class="view"></div>
+    <div id="v-mental" class="view"></div>
+    <div id="v-film" class="view"></div>
+    <div id="v-log" class="view"></div>
+  </div>
+  <nav>
+    <button class="nb on" onclick="nav_go('home')" id="nb-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      HOME
+    </button>
+    <button class="nb" onclick="nav_go('train')" id="nb-train">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="6"/><line x1="6" y1="18" x2="18" y2="18"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/></svg>
+      TRAIN
+    </button>
+    <button class="nb" onclick="nav_go('mental')" id="nb-mental">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.66z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.66z"/></svg>
+      MENTAL
+    </button>
+    <button class="nb" onclick="nav_go('film')" id="nb-film">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      FILM
+    </button>
+    <button class="nb" onclick="nav_go('log')" id="nb-log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      LOG
+    </button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+<!-- TRIAL DATE MODAL -->
+<div class="modal-bg" id="trial-modal" onclick="closeTrialModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="hd3" style="margin-bottom:14px;">SET TRIAL DATE</div>
+    <div class="fg">
+      <span class="fl">NSW U16 CCC TRIALS DATE</span>
+      <input type="text" id="trial-date-input" placeholder="YYYY-MM-DD" maxlength="10">
+    </div>
+    <button class="btn btn-acc btn-full" onclick="saveTrialDate()">SAVE</button>
+  </div>
+</div>
+<!-- KICKING LOG MODAL -->
+<div class="modal-bg" id="kick-modal" onclick="closeModal('kick-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="hd3" style="margin-bottom:14px;">LOG KICKING SESSION</div>
+    <div class="fg">
+      <span class="fl">KICK TYPE</span>
+      <select id="k-type"><option>Conversion</option><option>Punt</option><option>Tactical</option><option>Goal Kick Practice</option><option>Drop Kick</option></select>
+    </div>
+    <div class="g2">
+      <div class="fg">
+        <span class="fl">MAKES</span>
+        <input type="number" id="k-makes" placeholder="8" min="0" max="100">
+      </div>
+      <div class="fg">
+        <span class="fl">TOTAL</span>
+        <input type="number" id="k-total" placeholder="10" min="1" max="100">
+      </div>
+    </div>
+    <div class="fg">
+      <span class="fl">MAX DISTANCE (m)</span>
+      <input type="number" id="k-dist" placeholder="35" min="0" max="80">
+    </div>
+    <div class="fg">
+      <span class="fl">CONDITIONS</span>
+      <select id="k-cond"><option>Still</option><option>Light Wind</option><option>Strong Wind</option><option>Rain</option><option>Crosswind</option></select>
+    </div>
+    <div class="fg">
+      <span class="fl">CONFIDENCE (1–5)</span>
+      <div class="scale-row" id="k-conf-row">
+        <button class="sc-btn" onclick="selConf(1)">1</button>
+        <button class="sc-btn" onclick="selConf(2)">2</button>
+        <button class="sc-btn" onclick="selConf(3)">3</button>
+        <button class="sc-btn" onclick="selConf(4)">4</button>
+        <button class="sc-btn" onclick="selConf(5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <span class="fl">NOTES</span>
+      <textarea id="k-notes" placeholder="What was your focus? Anything felt different?" rows="2"></textarea>
+    </div>
+    <button class="btn btn-acc btn-full" onclick="saveKick()" style="margin-top:4px;">SAVE SESSION</button>
+  </div>
+</div>
+<!-- MONITOR MODAL -->
+<div class="modal-bg" id="mon-modal" onclick="closeModal('mon-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="hd3" style="margin-bottom:14px;">DAILY CHECK-IN</div>
+    <div class="fg">
+      <span class="fl">HAMSTRING STATUS</span>
+      <div style="display:flex;gap:7px;">
+        <button class="mon-opt" id="hs-g" onclick="selHS('g')">✓ CLEAR</button>
+        <button class="mon-opt" id="hs-y" onclick="selHS('y')">⚠ TIGHT</button>
+        <button class="mon-opt" id="hs-r" onclick="selHS('r')">✗ PAIN</button>
+      </div>
+    </div>
+    <div class="fg">
+      <span class="fl">FATIGUE (1 = FRESH  5 = COOKED)</span>
+      <div class="scale-row" id="fat-row">
+        <button class="sc-btn" onclick="selFat(1)">1</button>
+        <button class="sc-btn" onclick="selFat(2)">2</button>
+        <button class="sc-btn" onclick="selFat(3)">3</button>
+        <button class="sc-btn" onclick="selFat(4)">4</button>
+        <button class="sc-btn" onclick="selFat(5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <span class="fl">SLEEP QUALITY (1 = BAD  5 = GREAT)</span>
+      <div class="scale-row" id="slp-row">
+        <button class="sc-btn" onclick="selSlp(1)">1</button>
+        <button class="sc-btn" onclick="selSlp(2)">2</button>
+        <button class="sc-btn" onclick="selSlp(3)">3</button>
+        <button class="sc-btn" onclick="selSlp(4)">4</button>
+        <button class="sc-btn" onclick="selSlp(5)">5</button>
+      </div>
+    </div>
+    <div class="fg">
+      <span class="fl">NOTES (Pain, tightness, anything unusual)</span>
+      <textarea id="mon-notes" placeholder="e.g. Left hamstring slightly tight after sprints..."></textarea>
+    </div>
+    <button class="btn btn-acc btn-full" onclick="saveMon()">SAVE CHECK-IN</button>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════════
+const SK='lewis_v5';let ST={};
+try{ST=JSON.parse(localStorage.getItem(SK)||'{}')}catch{}
+const sg=(k,d)=>ST[k]!==undefined?ST[k]:d;
+const ss=(k,v)=>{ST[k]=v;try{localStorage.setItem(SK,JSON.stringify(ST))}catch{}};
+const today=()=>new Date().toISOString().slice(0,10);
+
+// ═══════════════════════════════════════════════════════════
+// DATA — GYM
+// ═══════════════════════════════════════════════════════════
+const GYM={
+  A:{tag:'STRENGTH + POWER',name:'Strength & Power',
+    focus:'Highest mechanical load day. Back squats, trap bar jumps, push press. Carbs before, protein + carbs after fast.',
+    nut:'<strong>Pre (60–90 min):</strong> Big carb meal — oats + banana + milk, or rice + chicken<br><strong>Post (30 min):</strong> Whey shake + banana → full meal within 90 min<br><strong>Evening:</strong> Protein + slow carbs (sweet potato over white rice — recovery overnight)',
+    blocks:[
+      {n:'Plyometrics',ex:[
+        {id:'a1',n:'Pogos',s:3,r:'10',note:'Minimal ground contact — stiff ankle'},
+        {id:'a2',n:'Broad Jumps',s:3,r:'3',note:'Max horizontal distance each rep'},
+        {id:'a3',n:'Explosive Push-Ups',s:3,r:'8',note:'Hands leave the ground'}
+      ]},
+      {n:'Power',ex:[
+        {id:'a4',n:'Trap Bar Jumps',s:3,r:'3',note:'30–40% squat 1RM — maximal bar speed, not weight'}
+      ]},
+      {n:'Strength Contrast',ex:[
+        {id:'a5',n:'Back Squat',s:3,r:'4',note:'RPE 7–8 → rest exactly 5 minutes before box jumps'},
+        {id:'a6',n:'Box Jump',s:3,r:'3',note:'Maximal intent — treat every jump like a 100m race'},
+        {id:'a7',n:'SL Drop Landing',s:3,r:'4ea',note:'Drop to single leg hold — 2s pause at the bottom'}
+      ]},
+      {n:'Upper',ex:[
+        {id:'a8',n:'Push Press',s:3,r:'5',note:'Drive through the legs — this is a power exercise'},
+        {id:'a9',n:'Explosive Pendlay Row',s:3,r:'4',note:'Maximal concentric intent on every rep'},
+        {id:'a10',n:'Pull-Ups',s:3,r:'5',note:'Full range — dead hang to chin over bar'}
+      ]},
+      {n:'Posterior Chain',ex:[
+        {id:'a11',n:'Hip Thrust',s:3,r:'5',note:'Full hip extension at the top — squeeze hard'}
+      ]},
+      {n:'Core',ex:[
+        {id:'a12',n:'Dead Bug',s:2,r:'8ea',note:'Low back stays pinned to the floor the entire time'},
+        {id:'a13',n:'Pallof Hold',s:2,r:'8ea',note:'Resist rotation — no letting the cable pull you'}
+      ]}
+    ]},
+  B:{tag:'SPEED + OLYMPIC',name:'Speed-Strength & Olympic',
+    focus:'Highest CNS demand. Hang cleans first — before any fatigue. Nordics at session end. Your nervous system is working as hard as your muscles.',
+    nut:'<strong>Pre (60–90 min):</strong> Carbs — avoid heavy fat or fibre in this window (discomfort under cleans)<br><strong>Mid-session:</strong> Banana between Olympic + strength blocks if 90+ min<br><strong>Post:</strong> Whey + fast carbs + creatine. Omega-3 with evening meal — Nordics hit hamstrings hard',
+    blocks:[
+      {n:'Activation',ex:[
+        {id:'b1',n:'90/90 Switches',s:2,r:'8ea',note:'Controlled — feel each position'},
+        {id:'b2',n:'Ankle Pops',s:2,r:'20',note:'Quick and light'},
+        {id:'b3',n:'SL RDL Bodyweight',s:2,r:'6ea',note:'Balance + hip hinge pattern'},
+        {id:'b4',n:'Band Neck Work',s:2,r:'10ea',note:'All four directions — controlled'}
+      ]},
+      {n:'Olympic Power — DO FIRST',ex:[
+        {id:'b5',n:'Hang Power Clean',s:4,r:'3',note:'RPE 7 · 60–70% 1RM · 3 min between sets — this is the session centrepiece'}
+      ]},
+      {n:'Plyometrics',ex:[
+        {id:'b6',n:'Lateral Bounds',s:3,r:'4ea',note:'Explosive push off — stick the landing'},
+        {id:'b7',n:'SL Broad Jump',s:3,r:'3ea',note:'Push and hold — balance is part of the exercise'},
+        {id:'b8',n:'Seated Box Jump',s:3,r:'4',note:'No countermovement — pure power from stopped position'}
+      ]},
+      {n:'Strength Contrast',ex:[
+        {id:'b9',n:'Bulgarian Split Squat',s:3,r:'4ea',note:'RPE 7 → 4 min rest before lateral bounds'},
+        {id:'b10',n:'Lateral Bound (Contrast)',s:3,r:'3ea',note:'Maximal intent immediately after BSS'}
+      ]},
+      {n:'Posterior Chain',ex:[
+        {id:'b11',n:'RDL',s:3,r:'6',note:'3s eccentric — feel the hamstring loaded the whole way down'},
+        {id:'b12',n:'Nordic Eccentrics',s:3,r:'5',note:'30s rest between reps · full reset · your most important hamstring exercise'}
+      ]},
+      {n:'Upper',ex:[
+        {id:'b13',n:'Chest-Supported Row',s:3,r:'6',note:'Full retraction at the top of every rep'},
+        {id:'b14',n:'Bench Press',s:3,r:'5',note:'Controlled descent, strong press'}
+      ]},
+      {n:'Lower Leg',ex:[
+        {id:'b15',n:'SL Calf Raise',s:3,r:'15',note:'Slow tempo — 2 up, pause, 2 down'}
+      ]},
+      {n:'Finisher',ex:[
+        {id:'b16',n:'Copenhagen Adductor',s:3,r:'8ea',note:'Short lever — manage load through range'},
+        {id:'b17',n:'Landmine 180',s:3,r:'8ea',note:'Control the rotation — don\'t throw the bar'}
+      ]}
+    ]},
+  C:{tag:'RESILIENCE',name:'Light Resilience',
+    focus:'Low CNS demand. Isometrics, neck/shoulder, lower leg. Half-rest day nutritionally. Best day to top up hydration and sleep.',
+    nut:'<strong>Pre:</strong> Normal snack — rice cakes + PB, yoghurt, fruit. No need to carb-load for this session<br><strong>Post:</strong> Standard protein meal, no urgency on the shake<br><strong>Today:</strong> Top up hydration target (3–3.5L) and prioritise early bedtime',
+    blocks:[
+      {n:'Neck + Shoulder',ex:[
+        {id:'c1',n:'Band Neck Work',s:3,r:'12ea',note:'All directions — be deliberate, this protects you in contact'},
+        {id:'c2',n:'Band Pull-Apart',s:3,r:'15',note:'Squeeze scapulae at the end of each rep'},
+        {id:'c3',n:'Face Pull',s:3,r:'15',note:'External rotation at the top'},
+        {id:'c4',n:'YTW Raises',s:2,r:'10ea',note:'Light weight — feel the shoulders, not the traps'},
+        {id:'c5',n:'Band External Rotation',s:2,r:'12ea',note:'Controlled — not too fast'}
+      ]},
+      {n:'Upper Strength',ex:[
+        {id:'c6',n:'Pull-Ups',s:4,r:'5',note:'Quality reps — full hang to chin over'},
+        {id:'c7',n:'Incline DB Bench',s:3,r:'10',note:'3s eccentric — slow and controlled'}
+      ]},
+      {n:'Isometrics',ex:[
+        {id:'c8',n:'Hamstring ISO Hold',s:3,r:'30s',note:'Note asymmetry — if one side is significantly harder, flag it'},
+        {id:'c9',n:'Copenhagen Adductor ISO',s:3,r:'20s ea',note:'Short lever — build capacity before moving to long lever'}
+      ]},
+      {n:'Lower Leg + Core',ex:[
+        {id:'c10',n:'Tibialis Raise',s:3,r:'20',note:'Controlled — anterior shin works hard'},
+        {id:'c11',n:'Hanging Knee Raise',s:3,r:'10',note:'No swinging — control up and down'},
+        {id:'c12',n:'Med Ball Rotational Slam',s:3,r:'8ea',note:'Rotate through the hips, not just arms'}
+      ]}
+    ]}
+};
+
+// ═══════════════════════════════════════════════════════════
+// DATA — FIELD SESSIONS
+// ═══════════════════════════════════════════════════════════
+const FIELD=[
+  {id:'f1',n:'Speed Session',tag:'SPEED',desc:'Wall Drive Sprint × 6 reps (full recovery between). Focus: acceleration mechanics — shin angle, arm drive, push not pull. Falling starts × 4. Close with conversion kicking: 8 in-front, 8 angled. Log every attempt.',nut:'Pre: Light carb snack — rice cakes + honey. Post: Electrolyte drink + tuna/rice within the hour.'},
+  {id:'f2',n:'Agility Session',tag:'AGILITY',desc:'T-drill × 5 each direction (full recovery). Pro agility × 6 (3 each direction). Decision agility: react to ball direction call. Focus: first step quickness and change of direction, not just cone touching. Close with conversion kicking: 10 attempts.',nut:'Pre: Same as speed. Intra: Sip electrolyte if 60+ min. Post: Protein + carbs within the hour.'},
+  {id:'f3',n:'Fullback Skills',tag:'SKILLS',desc:'High ball: 20 catches progressively under more pressure (catch, call, play on). Kick reading: partner or self-toss. Positional shadow work: move as if receiving kicks from the 10. Entering the line: timing runs off cones. Close with kicking.',nut:'Pre: Real carb meal 90 min before — this is technical. Your brain needs glucose.'},
+  {id:'f4',n:'Conditioning Session',tag:'CONDITIONING',desc:'Rugby-specific conditioning: 5 × 120m sprint @ 85% with 90s walk back. 4 × 40m shuttle (5-10-20-10-5) with 90s rest. Optional: 6 × 30m sprint from different starting positions. Close with kicking — 6 attempts only (quality over fatigue).',nut:'Pre: Biggest carb meal — this is your highest fuel demand field session. Post: Mandatory — electrolytes + protein shake + full meal within 90 min.'},
+  {id:'f5',n:'Conversion Kicking Only',tag:'KICKING',desc:'Standalone kicking session. 8 in-front (L centre, R centre, straight). 8 angled (L 45°, R 45°). 4 under simulated pressure (walk in from 40m, 30s to kick). Log: makes, misses, notes on contact and follow-through.',nut:'No specific fuel requirements. Hydrate — even mild dehydration affects kicking accuracy.'}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — VIDEOS
+// ═══════════════════════════════════════════════════════════
+const VIDS=[
+  {id:'v01',n:1,cat:'Fullback Analysis',title:'Will Jordan — Complete Fullback Analysis',url:'https://www.youtube.com/results?search_query=Will+Jordan+fullback+analysis+rugby+union',checks:['Track his positioning before the kick lands — how early does he commit to moving?','Counter-attack decision: run vs kick vs recycle — what triggers each choice?','Watch how he communicates with his wingers under the high ball']},
+  {id:'v02',n:2,cat:'Fullback Analysis',title:'Beauden Barrett — Positional Play & Decision Making',url:'https://www.youtube.com/results?search_query=Beauden+Barrett+fullback+positioning+analysis+rugby',checks:['When does he hold depth vs push into the attacking line?','Watch his kicking selection out of hand — why that kick in that moment?','Count how many times he enters the line vs holds width in a single game']},
+  {id:'v03',n:3,cat:'Fullback Analysis',title:'Hugo Keenan — Defensive Fullback Masterclass',url:'https://www.youtube.com/results?search_query=Hugo+Keenan+fullback+defensive+analysis+rugby',checks:['Watch his tackle technique under the high ball — body position at contact','How does he organise the back three in kick chase — calls and channel assignments','When does he push into the defensive line vs hold as the sweeper?']},
+  {id:'v04',n:4,cat:'Fullback Analysis',title:'Israel Folau — Counter-Attack Running Lines',url:'https://www.youtube.com/results?search_query=Israel+Folau+counter+attack+running+lines+analysis+rugby',checks:['Watch the variety in running lines — straight vs curved vs diagonal','When does he accelerate before contact vs step and evade?','Track his support play positioning when not the primary carrier']},
+  {id:'v05',n:5,cat:'Fullback Analysis',title:'Liam Williams — High Ball Under Pressure',url:'https://www.youtube.com/results?search_query=Liam+Williams+fullback+high+ball+rugby+analysis',checks:['How early does he call the ball — before or after it peaks?','Body positioning on the catch under physical pressure from chasers','Post-catch: how fast is the decision and how clean is the execution?']},
+  {id:'v06',n:6,cat:'Fullback Analysis',title:'Jordie Barrett — Attacking Fullback Role',url:'https://www.youtube.com/results?search_query=Jordie+Barrett+attacking+fullback+rugby+analysis',checks:['Timing of line entry — count seconds from ball leaving 9 to his arrival in the line','Watch how he fixes defenders before releasing the pass','Note depth and width variation depending on game state and phase']},
+  {id:'v07',n:7,cat:'Fullback Analysis',title:'Stuart Hogg — Reading the Game',url:'https://www.youtube.com/results?search_query=Stuart+Hogg+fullback+game+reading+anticipation+rugby',checks:['How does he anticipate kicks before they are struck — what cues is he reading?','Watch him organise the back three — voice level and body language under pressure','Kicking out of hand: when does he choose short, long, or high?']},
+  {id:'v08',n:8,cat:'Fullback Analysis',title:'Tom Pennycook — Modern Fullback Breakdown',url:'https://www.youtube.com/results?search_query=Tom+Pennycook+rugby+fullback+analysis+highlights',checks:['Observe his acceleration off the mark — compare to your own first-step speed','Decision-making in tight spaces immediately after catching','Compare his modern style to the established fullbacks above — what is different?']},
+  {id:'v09',n:9,cat:'Rugby IQ & Tactics',title:'Fullback Role — Complete Positional Guide',url:'https://www.youtube.com/results?search_query=fullback+role+rugby+union+complete+guide+positioning+responsibilities',checks:['Memorise the depth rules at different phases of play','When is it right to drift wide vs hold central width?','What are the fullback\'s specific communication responsibilities in defence?']},
+  {id:'v10',n:10,cat:'Rugby IQ & Tactics',title:'Reading Kicks — How Elite Backs Track the Ball',url:'https://www.youtube.com/results?search_query=reading+kicks+rugby+union+tracking+high+ball+back+three',checks:['What physical cues does the receiver read before the ball is struck?','Does early movement happen before or after the ball leaves the boot?','How does the calling system work between three players — who has priority?']},
+  {id:'v11',n:11,cat:'Rugby IQ & Tactics',title:'Counter-Attack — When to Go vs When to Hold',url:'https://www.youtube.com/results?search_query=counter+attack+decision+rugby+union+when+to+kick+when+to+run',checks:['What visual cues signal that space exists to attack immediately?','Watch support player positioning during the counter — who trails the ball carrier?','How do they assess risk vs reward in real time — what are the triggers?']},
+  {id:'v12',n:12,cat:'Rugby IQ & Tactics',title:'Defensive Line Speed & Back Organisation',url:'https://www.youtube.com/results?search_query=defensive+line+speed+rugby+backs+organisation+back+three+analysis',checks:['What triggers the line to push up — the 9 picking up, or the pass?','How does the fullback position as sweeper vs joining the defensive line?','Inside shoulder cover: when do backs track the inside channel threat?']},
+  {id:'v13',n:13,cat:'Rugby IQ & Tactics',title:'Kick Chase Systems — Back Three Roles',url:'https://www.youtube.com/results?search_query=kick+chase+system+rugby+back+three+channel+roles',checks:['Channel responsibilities in kick chase — who goes left, centre, right?','Who contests the high ball vs who covers the grubber or regather?','Transition from chase to attack after a successful regather']},
+  {id:'v14',n:14,cat:'Rugby IQ & Tactics',title:'Overlap Recognition & Attacking Lines',url:'https://www.youtube.com/results?search_query=overlap+recognition+attacking+backline+rugby+union+backs',checks:['When is the right moment to hold the pass vs release early?','How do backs fix a defender with their eyes and body before passing?','Watch the depth of attacking running lines — when do they straighten vs arc?']},
+  {id:'v15',n:15,cat:'Kicking',title:'Punt Kicking Technique for Backs',url:'https://www.youtube.com/results?search_query=punt+kicking+technique+rugby+backs+tutorial+coaching+breakdown',checks:['Contact point on the ball — exactly where does the foot meet it?','Non-kicking foot placement and knee bend at the moment of contact','Follow-through direction relative to target — does it track straight?']},
+  {id:'v16',n:16,cat:'Kicking',title:'Goal Kicking — Full Technique Breakdown',url:'https://www.youtube.com/results?search_query=goal+kicking+technique+rugby+union+conversion+full+breakdown+tutorial',checks:['Routine consistency — same steps, same timing, same process every single kick','Ball placement and tee angle changes depending on position on the field','Head position through and after the strike — does it stay down?']},
+  {id:'v17',n:17,cat:'Kicking',title:'Kicking Under Pressure — Mental Routine',url:'https://www.youtube.com/results?search_query=kicking+under+pressure+rugby+mental+routine+concentration+late+kick',checks:['What physical cues reset focus after a distraction or missed kick?','Does the step sequence change under crowd noise and high stakes?','How do elite kickers manage arousal level before high-pressure attempts?']},
+  {id:'v18',n:18,cat:'Kicking',title:'Box Kick & Tactical Kicking for Fullbacks',url:'https://www.youtube.com/results?search_query=box+kick+tactical+kicking+fullback+rugby+tutorial+coaching',checks:['Height vs distance trade-off — when does each serve the game?','Landing zone targeting — where exactly for optimal contest situation?','Who leads the chase and who covers the alternative (grubber, regather)?']},
+  {id:'v19',n:19,cat:'Gym & Athletic',title:'Bristol Rugby — Gym Day Behind the Scenes',url:'https://www.youtube.com/results?search_query=Bristol+Rugby+gym+day+behind+scenes+training+players',checks:['How is the session structured and paced across different blocks?','What exercises do the backs do that you recognise from your own program?','What coaching cues can you borrow and apply to your own sessions?']},
+  {id:'v20',n:20,cat:'Gym & Athletic',title:'All Blacks Training — Full Session',url:'https://www.youtube.com/results?search_query=All+Blacks+training+session+behind+scenes+preparation',checks:['Observe warm-up quality — not just what exercises but how deliberately they do them','What intensity benchmark do they train at? Compare honestly to yourself.','Watch the culture and focus habits — what is the minimum standard?']},
+  {id:'v21',n:21,cat:'Gym & Athletic',title:'Sprint Mechanics for Rugby Players',url:'https://www.youtube.com/results?search_query=sprint+mechanics+rugby+players+speed+development+coaching+technique',checks:['Acceleration phase: shin angle and push direction at each step','Arm drive pattern — notice the symmetry and full range of motion','How does posture change between drive phase (0–20m) and top speed?']},
+  {id:'v22',n:22,cat:'Gym & Athletic',title:'Plyometric Training for Rugby Backs',url:'https://www.youtube.com/results?search_query=plyometric+training+rugby+backs+explosive+power+development+session',checks:['What is ground contact time doing in quality reps vs tired reps — what changes?','Landing mechanics: absorbing properly or collapsing at the knee/hip?','How does plyometric difficulty and volume progress across a session?']},
+  {id:'v23',n:23,cat:'Gym & Athletic',title:'Hang Power Clean — Full Tutorial',url:'https://www.youtube.com/results?search_query=hang+power+clean+tutorial+form+coaching+athlete',checks:['How high does the bar travel before the catch — is it high enough?','Foot width at the catch vs starting position — how does it change?','Hip drive timing — exactly when relative to the arm pull and shrug?']},
+  {id:'v24',n:24,cat:'Behind the Scenes',title:'Leinster — Match Day Preparation',url:'https://www.youtube.com/results?search_query=Leinster+rugby+match+day+preparation+routine+behind+scenes',checks:['What does their pre-game routine look like in structure and timing?','How does warm-up intensity progressively build toward full speed?','What focus rituals do individual players use — can you adopt any?']},
+  {id:'v25',n:25,cat:'Behind the Scenes',title:'Super Rugby — Training Week Vlog',url:'https://www.youtube.com/results?search_query=super+rugby+training+week+vlog+professional+players',checks:['How are sessions sequenced and spaced across the week?','What recovery habits appear consistently between sessions?','What is the professional standard of effort and attention to detail?']},
+  {id:'v26',n:26,cat:'Behind the Scenes',title:'NSW Waratahs — Training Behind the Scenes',url:'https://www.youtube.com/results?search_query=NSW+Waratahs+training+behind+scenes+squad',checks:['This is your direct pathway — pay very close attention to the standards set','What physical and skill demands are expected at this level?','What habits and attitudes separate the players who stay vs who get cut?']},
+  {id:'v27',n:27,cat:'Behind the Scenes',title:'Professional Rugby Player — Day in the Life',url:'https://www.youtube.com/results?search_query=professional+rugby+player+day+in+life+routine+vlog',checks:['How is time structured around training sessions throughout the day?','What recovery habits appear non-negotiable in their routine?','How does nutrition timing actually look in daily practice — real food, real timing?']},
+  {id:'v28',n:28,cat:'Mental Performance',title:'Visualisation for Athletes — How to Do It Properly',url:'https://www.youtube.com/results?search_query=visualisation+technique+athletes+sport+psychology+mental+rehearsal+guide',checks:['What is the science behind mental rehearsal — why does it actually work?','What sensory details should you include for maximum transfer to performance?','How often and when is visualisation most effective in the training week?']},
+  {id:'v29',n:29,cat:'Mental Performance',title:'Pre-Game Routine — Elite Sport Psychology',url:'https://www.youtube.com/results?search_query=pre+game+mental+routine+elite+athlete+sport+psychology+arousal+control',checks:['What arousal control strategies do elite athletes use before competition?','How do they build and protect their pre-game routine from disruption?','What is the transition from preparation state into full performance state?']},
+  {id:'v30',n:30,cat:'Mental Performance',title:'Decision Making Under Fatigue — Sport Science',url:'https://www.youtube.com/results?search_query=decision+making+fatigue+rugby+sport+science+cognitive+performance',checks:['Why does decision-making specifically degrade under physical fatigue?','How can you pre-load decisions to reduce cognitive load during games?','What recovery between high-intensity bouts helps restore decision quality?']}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — VISUALISATION SCRIPTS
+// ═══════════════════════════════════════════════════════════
+const SCRIPTS=[
+  {id:'vs1',title:'High Ball Under Pressure',dur:'3 min',text:`Close your eyes. Three slow breaths — in through the nose, out through the mouth.
+
+You are at fullback. Their 10 shapes to kick. You track the ball off his boot — early call, before it peaks. "MINE!" — loud, clear, your voice carries across the ground.
+
+You move into position underneath it. Eyes locked on the ball. The wind catches it slightly right — you adjust two steps. Feet settle under you.
+
+The ball comes down. You see the stitching rotate. Soft hands — you take it cleanly. No panic. Your fingers wrap and hold.
+
+You scan left. Space on the edge. Your winger calling. You fire the pass. Clean. Gone.
+
+Reset. Back to depth. That's the job.
+
+Breathe out slowly. Replay the catch one more time in your mind.`},
+  {id:'vs2',title:'Reading the Kick & Repositioning',dur:'3 min',text:`Close your eyes. Slow your breathing.
+
+You are at fullback, 30 metres back. Their halfback picks up — the play shifts right. Their 10 takes it at pace. You watch his body shape load for a kick. You start moving before the ball leaves his boot.
+
+Box kick — high, short. You've called it before it peaks. You're moving forward now. The chaser is hard off the left channel. You track the ball. Track the chaser. Ball first. Always ball first.
+
+You take it at chest height — in traffic. You immediately go to ground and present. Low, protected. Your team clears. Gain line held.
+
+That read didn't happen in the moment. It happened in sessions like this one. You did it a hundred times before this game.
+
+Breathe. Let that settle.`},
+  {id:'vs3',title:'Entering the Line as an Attacker',dur:'3 min',text:`Close your eyes. Breathe slowly.
+
+Your team has the ball. You're ten metres behind the line, tracking the play moving right.
+
+Pick your entry point. Timing is everything. Too early — you kill the space. Too late — the moment's gone. You wait. You read the 13's shoulders.
+
+Now. You accelerate hard. The 13 holds the defender an extra half-second. You're through the gap before the defence reacts. Running at their fullback who has drifted.
+
+Outside shoulder. Body dip. Burst. You're clear. Gone.
+
+Even if you don't score — you pulled two defenders. Your winger scored off the overlap your run created. Your entry made the try.
+
+Sit with that for a moment.`},
+  {id:'vs4',title:'Kick Chase & Regather',dur:'2 min',text:`Close your eyes.
+
+You've just kicked — a long spiral to the left corner. You're sprinting before it even lands.
+
+Covering ground fast. The catcher is under pressure. You can see his feet adjusting, uncertain. He's not comfortable.
+
+You pin him. One metre. He kicks — hurried, weak. Your winger reads it early. Clean gather. Gain.
+
+You pull up. Seventy-two minutes. Legs are heavy. You feel it in your quads.
+
+"Next play."
+
+Not the scoreboard. Not the ache. Not the minutes left. Next play.
+
+Breathe out. You're ready.`},
+  {id:'vs5',title:'Pre-Game — Final 5 Minutes',dur:'5 min',text:`Find somewhere quiet if you can. Feet firmly on the ground.
+
+Three slow breaths. In through the nose. Hold two counts. Out through the mouth. Let the crowd noise and the noise in your head settle into the background.
+
+You have prepared for this. Your body knows what to do. Your mind knows the game.
+
+Picture your first action of the game. The kick comes to you. You call it early. You take it cleanly. You play on.
+
+That is the only job right now. The first action. Everything after follows from that.
+
+Feel your feet on the ground. Open and close your hands. Roll your shoulders back and down. You are here. You are ready.
+
+Open your eyes. Shake out your hands.
+
+It's time.`}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — CUES
+// ═══════════════════════════════════════════════════════════
+const CUES=[
+  {sit:'High Ball',icon:'🏉',items:['Early call — loud and clear before it peaks','Eyes on the ball, not the chaser — ball first always','Soft hands — catch, then decide','Two steps to space before you pass']},
+  {sit:'Defence',icon:'🛡️',items:['Line speed — trigger on the 9 picking up','Cover inside shoulder before outside threat','Stay connected to your winger — no drift gaps','Talk — call the runner before he runs']},
+  {sit:'Attack',icon:'⚡',items:['Enter late, run hard — timing beats raw speed','Fix your defender before you release the pass','Hold it one beat longer than feels comfortable','Width creates time for the next player']},
+  {sit:'Fatigue (70+ min)',icon:'🔋',items:['Next play. Just this one.','Head up — work rate follows mind, not legs','Breathe out on contact — it resets the system','Win your 1v1. That\'s the whole job.']}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — PRE-GAME CHECKLIST
+// ═══════════════════════════════════════════════════════════
+const PREGAME={
+  nightBefore:{title:'NIGHT BEFORE',items:['Gear bag fully packed and ready','Carb-heavy dinner eaten (pasta or rice + lean protein)','No screens after 9:30pm','Magnesium taken + 500ml water before bed','In bed by 10pm','Visualisation script done — pre-game script or high ball']},
+  morning:{title:'MATCH MORNING',items:['500ml water immediately on waking — before anything else','Breakfast eaten — oats + banana + 2 eggs minimum','Kit and boots checked (mouthguard, tape, phone charged)','Pre-game meal timed (3–4 hours before kickoff)','Box breathing completed — 2 full minutes','Session intent set — first 3 actions of the game']},
+  preGame:{title:'90 MIN TO KICKOFF',items:['Rice cakes + honey eaten (90 min before)','Electrolyte drink started — not just water','Warm-up done deliberately — not rushed through','Cue picked for today (1 cue, not all of them)','Final visualisation done — 3 min pre-game script','Gear on, head clear — ready']}
+};
+
+// ═══════════════════════════════════════════════════════════
+// DATA — RECOVERY STEPS
+// ═══════════════════════════════════════════════════════════
+const REC=[
+  {n:'Hot (Sauna or Hot Plunge)',mins:8,tip:'Sit. Breathe slowly and deeply. Let the heat work through the muscles. Don\'t rush this.'},
+  {n:'Cold Plunge',mins:3,tip:'Get in quickly — don\'t hesitate. Slow your exhale. Don\'t fight it, breathe through it.'},
+  {n:'Hot Plunge / Warm Shower',mins:2,tip:'Transition phase. Let your body absorb the contrast. Keep breathing slow and controlled.'},
+  {n:'Cold Plunge (Final)',mins:1,tip:'Short and sharp. Commit fully. Finish here.'},
+  {n:'Hydrate + Rest',mins:3,tip:'Electrolyte drink immediately. Protein snack if needed. Sit quietly for a few minutes.'},
+  {n:'Easy Pool Swim (Optional)',mins:5,tip:'Light movement only — flush the legs. Absolute zero effort. More of a float than a swim.'}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — DAILY CHECKLIST
+// ═══════════════════════════════════════════════════════════
+const DAILY=[
+  {id:'water',lbl:'500ml water on waking'},
+  {id:'sunlight',lbl:'5–10 min sunlight exposure'},
+  {id:'vis',lbl:'Visualisation done (5 min)'},
+  {id:'creatine',lbl:'Creatine taken (3–5g)'},
+  {id:'omega3',lbl:'Omega-3 taken'},
+  {id:'mag',lbl:'Magnesium taken (before bed)'},
+  {id:'protein',lbl:'Protein on track (130g+)'},
+  {id:'stretch',lbl:'Stretching protocol done'},
+  {id:'log',lbl:'Session logged (Hevy or Fifteen)'}
+];
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const VIEWS=['home','train','mental','film','log'];
+let curView='home';
+let breathTimer=null;
+
+function nav_go(id){
+  if(breathTimer){clearInterval(breathTimer);breathTimer=null}
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('v-'+id).classList.add('on');
+  document.getElementById('nb-'+id).classList.add('on');
+  curView=id;
+  ({home:rHome,train:rTrain,mental:rMental,film:rFilm,log:rLog})[id]?.();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id,e){if(!e||e.target.id===id)document.getElementById(id).classList.remove('show')}
+function closeTrialModal(e){if(e.target.id==='trial-modal')closeModal('trial-modal')}
+
+// ═══════════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════════
+function trialDateVal(){return sg('trialDate','2026-05-15')}
+function daysLeft(){
+  const d=new Date(trialDateVal()+'T00:00:00'),t=new Date();
+  t.setHours(0,0,0,0);return Math.ceil((d-t)/86400000);
+}
+
+function rHome(){
+  const td=today(),checks=sg('dailyChecks',{}),tc=checks[td]||{};
+  const done=DAILY.filter(i=>tc[i.id]).length;
+  const pct=Math.round(done/DAILY.length*100);
+  const dl=daysLeft(),dla=Math.max(0,dl);
+  const unit=dl>1?'DAYS TO GO':dl===1?'DAY TO GO':dl===0?'IT\'S TODAY':'TRIALS DONE';
+  const mons=sg('monLogs',[]),todayMon=mons.find(m=>m.date===td);
+  const hsColors={g:'var(--grn)',y:'var(--yel)',r:'var(--red)'};
+  const hsLabels={g:'CLEAR',y:'TIGHT',r:'PAIN'};
+  const dateStr=new Date().toLocaleDateString('en-AU',{weekday:'long',month:'long',day:'numeric'});
+  const kicks=sg('kickLog',[]);
+  const kToday=kicks.filter(k=>k.date===td).length;
+
+  document.getElementById('v-home').innerHTML=`
+<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;">
+  <div class="hd1">FIFTEEN</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--txt2);letter-spacing:.07em;text-transform:uppercase;text-align:right;line-height:1.4;">${dateStr}</div>
+</div>
+
+<div class="cd-card" onclick="openModal('trial-modal')">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+    <div>
+      <div class="lbl" style="margin-bottom:8px;">NSW U16 CCC TRIALS</div>
+      <div class="cd-num">${dla}</div>
+      <div class="cd-unit">${unit}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(197,241,53,.4);letter-spacing:.08em;margin-bottom:3px;">TAP TO EDIT DATE</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(197,241,53,.55);">${trialDateVal()}</div>
+    </div>
+  </div>
+  <div class="pbar" style="margin-top:14px;"><div class="pfill" style="width:${Math.min(100,Math.max(0,((28-dla)/28)*100))}%"></div></div>
+</div>
+
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;">DAILY NON-NEGOTIABLES</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--acc);">${done}/${DAILY.length}</div>
+  </div>
+  <div class="pbar" style="margin-bottom:12px;"><div class="pfill" style="width:${pct}%"></div></div>
+  ${DAILY.map(item=>`<div class="chk-row ${tc[item.id]?'done':''}" onclick="toggleCheck('${item.id}')"><div class="chk-circle"><span class="chk-tick">✓</span></div><div style="font-size:14px;">${item.lbl}</div></div>`).join('')}
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+  <div class="hd3" style="font-size:18px;">QUICK ACCESS</div>
+</div>
+<div class="qg">
+  <button class="qb" onclick="openModal('kick-modal')"><div class="qb-icon">🏉</div><div class="qb-lbl">LOG KICKING</div><div class="qb-sub">${kToday>0?kToday+' session'+(kToday>1?'s':'')+' today':'No sessions yet'}</div></button>
+  <button class="qb" onclick="openModal('mon-modal')"><div class="qb-icon">📊</div><div class="qb-lbl">CHECK IN</div><div class="qb-sub">${todayMon?'HS: '+(hsLabels[todayMon.hs]||'—'):'Not done today'}</div></button>
+  <button class="qb" onclick="nav_go('mental')"><div class="qb-icon">🧠</div><div class="qb-lbl">MENTAL</div><div class="qb-sub">Vis & breathing</div></button>
+  <button class="qb" onclick="nav_go('film')"><div class="qb-icon">🎬</div><div class="qb-lbl">FILM STUDY</div><div class="qb-sub">${sg('filmStatus',{}).length||0} watched</div></button>
+</div>
+
+${todayMon&&todayMon.hs==='r'?`<div style="background:var(--red-d);border:1px solid var(--red);border-radius:12px;padding:12px 14px;margin-bottom:12px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--red);margin-bottom:3px;">⚠ HAMSTRING FLAG — PAIN REPORTED</div><div style="font-size:12px;color:var(--txt2);">Reduce field session load. No sprints or plyometrics today. Monitor closely.</div></div>`:''}
+${todayMon&&todayMon.hs==='y'?`<div style="background:var(--yel-d);border:1px solid var(--yel);border-radius:12px;padding:12px 14px;margin-bottom:12px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--yel);margin-bottom:3px;">⚠ HAMSTRING TIGHT TODAY</div><div style="font-size:12px;color:var(--txt2);">Warm up thoroughly. Reduce sprint volume by 30%. If it tightens further — stop.</div></div>`:''}
+
+<div class="card">
+  <div class="lbl" style="margin-bottom:10px;">SESSION NUTRITION RULES</div>
+  <div style="font-size:13px;color:var(--txt2);line-height:1.65;">
+    <div style="margin-bottom:8px;"><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">GYM A:</span> Big carb meal 60–90 min before. Whey + banana within 30 min after.</div>
+    <div style="margin-bottom:8px;"><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">GYM B:</span> Carbs only pre-session. Omega-3 with evening meal (Nordics).</div>
+    <div style="margin-bottom:8px;"><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">GYM C:</span> Normal snack pre. Standard protein meal post. Top up hydration.</div>
+    <div style="margin-bottom:8px;"><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">FIELD:</span> Rice cakes + honey pre. Electrolyte during. Tuna/rice post.</div>
+    <div><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">GAME:</span> See full game day protocol in the MENTAL tab → Pre-Game.</div>
+  </div>
+</div>
+`;
+}
+
+function toggleCheck(id){
+  const td=today(),checks=sg('dailyChecks',{}),tc=checks[td]||{};
+  tc[id]=!tc[id];checks[td]=tc;ss('dailyChecks',checks);
+  rHome();
+}
+
+function setTrialDate(){
+  document.getElementById('trial-date-input').value=trialDateVal();
+  openModal('trial-modal');
+}
+function saveTrialDate(){
+  const v=document.getElementById('trial-date-input').value.trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v)){ss('trialDate',v);closeModal('trial-modal');rHome();toast('Trial date updated');}
+  else toast('Use format YYYY-MM-DD');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TRAIN
+// ═══════════════════════════════════════════════════════════
+let trainTab='gym';
+function rTrain(){
+  document.getElementById('v-train').innerHTML=`
+<div class="hd2">TRAINING</div>
+<div class="tabbar">
+  <button class="tbb ${trainTab==='gym'?'on':''}" onclick="switchTrainTab('gym')">GYM</button>
+  <button class="tbb ${trainTab==='field'?'on':''}" onclick="switchTrainTab('field')">FIELD</button>
+  <button class="tbb ${trainTab==='pregame'?'on':''}" onclick="switchTrainTab('pregame')">PRE-GAME</button>
+  <button class="tbb ${trainTab==='recovery'?'on':''}" onclick="switchTrainTab('recovery')">RECOVERY</button>
+</div>
+<div id="train-content"></div>`;
+  renderTrainTab();
+}
+function switchTrainTab(t){trainTab=t;renderTrainTab()}
+function renderTrainTab(){
+  const el=document.getElementById('train-content');
+  if(trainTab==='gym')el.innerHTML=renderGym();
+  else if(trainTab==='field')el.innerHTML=renderField();
+  else if(trainTab==='pregame')el.innerHTML=renderPreGame();
+  else el.innerHTML=renderRecovery();
+}
+
+function renderGym(){
+  return Object.entries(GYM).map(([key,s])=>{
+    const sets=sg('gymSets',{});
+    return`<div class="sess ${sg('sessOpen_'+key,false)?'open':''}" id="sess-${key}">
+      <div class="sess-hdr" onclick="toggleSess('${key}')">
+        <div class="sess-letter">${key}</div>
+        <div class="sess-info">
+          <div class="sess-tag">${s.tag}</div>
+          <div class="sess-name">${s.name}</div>
+        </div>
+        <svg class="sess-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sess-body">
+        <div class="sess-focus">${s.focus}</div>
+        ${s.blocks.map(b=>`
+          <div class="blk-hdr"><div class="blk-name">${b.n}</div><div class="blk-line"></div></div>
+          ${b.ex.map(e=>{
+            const doneKey=`gs_${e.id}_${today()}`;const doneSets=sg(doneKey,[]);
+            return`<div class="ex-row">
+              <div class="ex-name">${e.n}</div>
+              <div class="ex-meta">${e.s} sets × ${e.r}</div>
+              ${e.note?`<div class="ex-note">${e.note}</div>`:''}
+              <div class="sets-row">${Array.from({length:e.s},(_,i)=>`<button class="set-btn ${doneSets.includes(i)?'done':''}" onclick="toggleSet('${e.id}',${i},${e.s})">${i+1}</button>`).join('')}</div>
+            </div>`;
+          }).join('')}
+        `).join('')}
+        <div class="nut-box"><div class="lbl" style="margin-bottom:6px;color:var(--acc);">NUTRITION FOR THIS SESSION</div>${s.nut}</div>
+        <button class="btn btn-danger btn-sm btn-full" style="margin-top:12px;" onclick="clearGymSess('${key}')">RESET SESSION</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSess(key){
+  const cur=sg('sessOpen_'+key,false);
+  ['A','B','C'].forEach(k=>ss('sessOpen_'+k,false));
+  ss('sessOpen_'+key,!cur);
+  renderTrainTab();
+}
+
+function toggleSet(exId,idx,total){
+  const k=`gs_${exId}_${today()}`;const d=sg(k,[]);
+  if(d.includes(idx))d.splice(d.indexOf(idx),1);else d.push(idx);
+  ss(k,d);renderTrainTab();
+  if(d.length===total)toast('Set complete ✓');
+}
+
+function clearGymSess(key){
+  const s=GYM[key];
+  s.blocks.forEach(b=>b.ex.forEach(e=>ss(`gs_${e.id}_${today()}`,[]) ));
+  renderTrainTab();toast('Session reset');
+}
+
+function renderField(){
+  const fd=sg('fieldDone',{});
+  return FIELD.map(f=>`
+    <div class="sess ${sg('fieldOpen_'+f.id,false)?'open':''}" id="fsess-${f.id}">
+      <div class="sess-hdr" onclick="toggleFieldSess('${f.id}')">
+        <div class="sess-letter" style="font-size:24px;width:auto;margin-right:0;">🏃</div>
+        <div class="sess-info" style="margin-left:4px;">
+          <div class="sess-tag">${f.tag}</div>
+          <div class="sess-name">${f.n}</div>
+        </div>
+        ${fd[f.id]?`<span class="tag tag-g" style="margin-right:8px;">DONE</span>`:''}
+        <svg class="sess-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sess-body">
+        <div class="sess-focus">${f.desc}</div>
+        <div class="nut-box" style="margin-top:10px;"><span style="color:var(--acc);font-family:'Barlow Condensed',sans-serif;font-weight:700;">NUTRITION: </span>${f.nut}</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn btn-acc btn-sm" onclick="markField('${f.id}',true)">${fd[f.id]?'✓ COMPLETED':'MARK DONE'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('kick-modal')">LOG KICKING</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function toggleFieldSess(id){const cur=sg('fieldOpen_'+id,false);FIELD.forEach(f=>ss('fieldOpen_'+f.id,false));ss('fieldOpen_'+id,!cur);renderTrainTab()}
+function markField(id,v){const fd=sg('fieldDone',{});fd[id]=v;ss('fieldDone',fd);renderTrainTab();toast('Session marked done');}
+
+function renderPreGame(){
+  const pgd=sg('preGameChecks',{});
+  return Object.entries(PREGAME).map(([key,phase])=>`
+    <div class="pg-phase">
+      <div class="pg-phase-title">${phase.title}</div>
+      ${phase.items.map((item,i)=>{
+        const ck=`pg_${key}_${i}_${today()}`;const done=pgd[ck];
+        return`<div class="chk-row ${done?'done':''}" onclick="togglePG('${ck}')"><div class="chk-circle"><span class="chk-tick">✓</span></div><div style="font-size:14px;">${item}</div></div>`;
+      }).join('')}
+    </div>
+  `).join('')+`<button class="btn btn-danger btn-sm btn-full" style="margin-top:4px;" onclick="clearPG()">RESET PRE-GAME CHECKLIST</button>`;
+}
+function togglePG(ck){const pgd=sg('preGameChecks',{});pgd[ck]=!pgd[ck];ss('preGameChecks',pgd);renderTrainTab()}
+function clearPG(){const pgd=sg('preGameChecks',{});Object.keys(pgd).forEach(k=>{if(k.includes(`_${today()}`))delete pgd[k]});ss('preGameChecks',pgd);renderTrainTab();toast('Checklist reset')}
+
+let recStep=0,recRunning=false,recTimerID=null,recSecs=0;
+function renderRecovery(){
+  return`
+<div class="lbl" style="margin-bottom:12px;">RECOVERY SESSION — CONTRAST PROTOCOL</div>
+<div style="font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.6;">Use the gym recovery facilities. Hot/cold contrast is proven to reduce DOMS, flush metabolic waste, and improve next-session readiness. Do this after high-load sessions (Day A or Day B) or post-game.</div>
+${REC.map((step,i)=>`
+  <div class="rec-step ${i===recStep&&recRunning?'cur':''} ${i<recStep&&recRunning?'fin':''}" id="rstep-${i}">
+    <div class="step-num">${i+1}</div>
+    <div class="step-info">
+      <div class="step-name">${step.n}</div>
+      <div class="step-dur">${step.mins} min</div>
+      <div class="step-tip">${step.tip}</div>
+    </div>
+    ${i===recStep?`<button class="step-timer" id="rec-timer-btn" onclick="toggleRecTimer(${step.mins*60})">${recRunning?formatSecs(recSecs):step.mins+'m'}</button>`:''}
+  </div>
+`).join('')}
+<div style="display:flex;gap:8px;margin-top:14px;">
+  <button class="btn btn-acc btn-sm" onclick="startRec()">▶ START SESSION</button>
+  <button class="btn btn-ghost btn-sm" onclick="resetRec()">RESET</button>
+</div>`;
+}
+function startRec(){recStep=0;recRunning=false;recTimerID=null;recSecs=0;renderTrainTab();nextRecStep()}
+function nextRecStep(){if(recStep>=REC.length){toast('Recovery session complete 🎉');recRunning=false;recStep=0;return}recRunning=true;recSecs=REC[recStep].mins*60;renderTrainTab();startRecTimer()}
+function toggleRecTimer(total){if(recTimerID){clearInterval(recTimerID);recTimerID=null;renderTrainTab()}else startRecTimer()}
+function startRecTimer(){
+  if(recTimerID)clearInterval(recTimerID);
+  recTimerID=setInterval(()=>{
+    recSecs--;
+    const btn=document.getElementById('rec-timer-btn');
+    if(btn)btn.textContent=formatSecs(recSecs);
+    if(recSecs<=0){clearInterval(recTimerID);recTimerID=null;toast(REC[recStep].n+' done!');recStep++;if(recStep<REC.length){recSecs=REC[recStep].mins*60;renderTrainTab();startRecTimer()}else{recRunning=false;recStep=0;renderTrainTab();toast('Recovery complete 🎉')}}
+  },1000);
+}
+function resetRec(){if(recTimerID)clearInterval(recTimerID);recTimerID=null;recRunning=false;recStep=0;recSecs=0;renderTrainTab()}
+function formatSecs(s){const m=Math.floor(s/60),ss=s%60;return`${m}:${ss.toString().padStart(2,'0')}`}
+
+// ═══════════════════════════════════════════════════════════
+// MENTAL
+// ═══════════════════════════════════════════════════════════
+let mentalTab='vis';
+function rMental(){
+  document.getElementById('v-mental').innerHTML=`
+<div class="hd2">MENTAL</div>
+<div class="tabbar">
+  <button class="tbb ${mentalTab==='vis'?'on':''}" onclick="switchMentalTab('vis')">VISUALISE</button>
+  <button class="tbb ${mentalTab==='breath'?'on':''}" onclick="switchMentalTab('breath')">BREATHE</button>
+  <button class="tbb ${mentalTab==='cues'?'on':''}" onclick="switchMentalTab('cues')">CUES</button>
+</div>
+<div id="mental-content"></div>`;
+  renderMentalTab();
+}
+function switchMentalTab(t){if(breathTimer){clearInterval(breathTimer);breathTimer=null}mentalTab=t;renderMentalTab()}
+function renderMentalTab(){
+  const el=document.getElementById('mental-content');
+  if(mentalTab==='vis')el.innerHTML=renderVis();
+  else if(mentalTab==='breath')el.innerHTML=renderBreath();
+  else el.innerHTML=renderCues();
+}
+
+function renderVis(){
+  return SCRIPTS.map(s=>`
+    <div class="scr-card ${sg('scrOpen_'+s.id,false)?'open':''}" id="scr-${s.id}">
+      <div class="scr-hdr" onclick="toggleScr('${s.id}')">
+        <div>
+          <div class="lbl" style="margin-bottom:3px;">${s.dur}</div>
+          <div style="font-size:15px;font-weight:600;">${s.title}</div>
+        </div>
+        <svg class="scr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="scr-body">
+        <div class="scr-text">${s.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function toggleScr(id){const cur=sg('scrOpen_'+id,false);SCRIPTS.forEach(s=>ss('scrOpen_'+s.id,false));ss('scrOpen_'+id,!cur);renderMentalTab()}
+
+let breathPhase=0,breathCount=0,breathSecs=0,breathType='box';
+const BREATH_BOX=[{p:'INHALE',s:4,cl:'expand'},{p:'HOLD',s:4,cl:'hold-big'},{p:'EXHALE',s:4,cl:'contract'},{p:'HOLD',s:4,cl:'hold-small'}];
+const BREATH_478=[{p:'INHALE',s:4,cl:'expand'},{p:'HOLD',s:7,cl:'hold-big'},{p:'EXHALE',s:8,cl:'contract'}];
+
+function renderBreath(){
+  const phases=breathType==='box'?BREATH_BOX:BREATH_478;
+  const ph=phases[breathPhase%phases.length];
+  const active=breathTimer!==null;
+  return`
+<div style="margin-bottom:14px;">
+  <div class="tabbar">
+    <button class="tbb ${breathType==='box'?'on':''}" onclick="setBreathType('box')">BOX (4-4-4-4)</button>
+    <button class="tbb ${breathType==='478'?'on':''}" onclick="setBreathType('478')">4-7-8</button>
+  </div>
+  <div style="font-size:13px;color:var(--txt2);margin-bottom:4px;">
+    ${breathType==='box'?'Pre-performance: sharpens focus and regulates arousal before sessions or games.':'Recovery and sleep: slows heart rate and drops cortisol. Do this in bed.'}
+  </div>
+</div>
+<div class="breath-wrap">
+  <div class="bc-type">${breathType==='box'?'BOX BREATHING — 4-4-4-4':'4-7-8 BREATHING — RECOVERY'}</div>
+  <div class="bc-ring">
+    <div class="bc ${active?ph.cl:''}" id="breath-circle">
+      <div class="bc-num" id="breath-num">${active?breathSecs:ph.s}</div>
+      <div class="bc-phase" id="breath-phase">${active?ph.p:'READY'}</div>
+    </div>
+  </div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--txt2);margin-bottom:20px;">Round ${Math.floor(breathCount/phases.length)+1}</div>
+  <button class="btn ${active?'btn-ghost':'btn-acc'}" onclick="${active?'stopBreath()':'startBreath()'}">${active?'STOP':'START'}</button>
+</div>`;
+}
+
+function setBreathType(t){stopBreath();breathType=t;breathPhase=0;breathCount=0;breathSecs=0;renderMentalTab()}
+function startBreath(){
+  if(breathTimer)return;
+  const phases=breathType==='box'?BREATH_BOX:BREATH_478;
+  breathSecs=phases[breathPhase%phases.length].s;
+  renderMentalTab();
+  breathTimer=setInterval(()=>{
+    breathSecs--;
+    const ph=phases[breathPhase%phases.length];
+    const numEl=document.getElementById('breath-num');
+    const phEl=document.getElementById('breath-phase');
+    const circ=document.getElementById('breath-circle');
+    if(numEl)numEl.textContent=breathSecs;
+    if(phEl)phEl.textContent=ph.p;
+    if(circ){circ.className='bc '+ph.cl}
+    if(breathSecs<=0){
+      breathCount++;breathPhase=(breathPhase+1)%phases.length;
+      breathSecs=phases[breathPhase].s;
+    }
+  },1000);
+}
+function stopBreath(){if(breathTimer){clearInterval(breathTimer);breathTimer=null}breathPhase=0;breathCount=0;breathSecs=0;if(document.getElementById('mental-content'))renderMentalTab()}
+
+function renderCues(){
+  return CUES.map(g=>`
+    <div class="cue-grp">
+      <div class="cue-title">${g.icon} ${g.sit}</div>
+      ${g.items.map(c=>`<div class="cue-item">${c}</div>`).join('')}
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILM
+// ═══════════════════════════════════════════════════════════
+const FILM_CATS=['All','Fullback Analysis','Rugby IQ & Tactics','Kicking','Gym & Athletic','Behind the Scenes','Mental Performance'];
+let filmCat='All';
+
+function rFilm(){
+  const fs=sg('filmStatus',{});
+  const watched=Object.values(fs).filter(v=>v==='w').length;
+  const rewatch=Object.values(fs).filter(v=>v==='r').length;
+  document.getElementById('v-film').innerHTML=`
+<div class="hd2">FILM STUDY</div>
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-val">${watched}</div><div class="stat-lbl">WATCHED</div></div>
+  <div class="stat-box"><div class="stat-val">${rewatch}</div><div class="stat-lbl">REWATCH</div></div>
+  <div class="stat-box"><div class="stat-val">${30-watched}</div><div class="stat-lbl">REMAINING</div></div>
+</div>
+<div class="pills" id="film-pills">
+  ${FILM_CATS.map(c=>`<button class="pill ${filmCat===c?'on':''}" onclick="setFilmCat('${c}')">${c==='All'?'ALL (30)':c.toUpperCase()}</button>`).join('')}
+</div>
+<div id="film-list">${renderFilmList()}</div>`;
+}
+
+function setFilmCat(c){filmCat=c;document.querySelectorAll('.pill').forEach(p=>p.classList.toggle('on',p.textContent.includes(c==='All'?'ALL':c.toUpperCase())));document.getElementById('film-list').innerHTML=renderFilmList()}
+
+function renderFilmList(){
+  const fs=sg('filmStatus',{}),fi=sg('filmInsights',{});
+  const vids=filmCat==='All'?VIDS:VIDS.filter(v=>v.cat===filmCat);
+  return vids.map(v=>`
+    <div class="vc ${sg('filmOpen_'+v.id,false)?'open':''}" id="vc-${v.id}">
+      <div class="vc-hdr" onclick="toggleVc('${v.id}')">
+        <div class="vc-num">${v.n}</div>
+        <div class="vc-info">
+          <div class="vc-title">${v.title}</div>
+          <div class="vc-cat">${v.cat}</div>
+        </div>
+        <div class="vc-actions">
+          <div class="vc-dot ${fs[v.id]==='w'?'w':''}" onclick="setFilmStatus(event,'${v.id}','w')" title="Watched">✓</div>
+          <div class="vc-dot ${fs[v.id]==='r'?'r':''}" onclick="setFilmStatus(event,'${v.id}','r')" title="Rewatch">↻</div>
+        </div>
+      </div>
+      <div class="vc-body">
+        <div class="lbl" style="margin-bottom:7px;">WATCH CHECKLIST</div>
+        ${v.checks.map(c=>`<div class="wc-row">${c}</div>`).join('')}
+        <a class="yt-link" href="${v.url}" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          WATCH ON YOUTUBE
+        </a>
+        <div class="insight-box" style="margin-top:8px;">
+          <div class="lbl" style="margin-bottom:5px;font-size:9px;">KEY INSIGHTS (YOUR NOTES)</div>
+          <textarea placeholder="What did you learn? What will you apply?" rows="2" onchange="saveInsight('${v.id}',this.value)">${fi[v.id]||''}</textarea>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleVc(id){const cur=sg('filmOpen_'+id,false);ss('filmOpen_'+id,!cur);document.getElementById('film-list').innerHTML=renderFilmList()}
+function setFilmStatus(e,id,status){
+  e.stopPropagation();
+  const fs=sg('filmStatus',{});
+  fs[id]=fs[id]===status?null:status;
+  ss('filmStatus',fs);
+  document.getElementById('film-list').innerHTML=renderFilmList();
+  if(fs[id]==='w')toast('Marked as watched ✓');
+  else if(fs[id]==='r')toast('Added to rewatch ↻');
+}
+function saveInsight(id,val){const fi=sg('filmInsights',{});fi[id]=val;ss('filmInsights',fi)}
+
+// ═══════════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════════
+let logTab='kicking';
+let kConf=0,hsSel='',fatSel=0,slpSel=0;
+
+function rLog(){
+  document.getElementById('v-log').innerHTML=`
+<div class="hd2">LOG</div>
+<div class="tabbar">
+  <button class="tbb ${logTab==='kicking'?'on':''}" onclick="switchLogTab('kicking')">KICKING</button>
+  <button class="tbb ${logTab==='monitor'?'on':''}" onclick="switchLogTab('monitor')">MONITOR</button>
+  <button class="tbb ${logTab==='week'?'on':''}" onclick="switchLogTab('week')">WEEK</button>
+</div>
+<div id="log-content"></div>`;
+  renderLogTab();
+}
+function switchLogTab(t){logTab=t;renderLogTab()}
+function renderLogTab(){
+  const el=document.getElementById('log-content');
+  if(logTab==='kicking')el.innerHTML=renderKickLog();
+  else if(logTab==='monitor')el.innerHTML=renderMonLog();
+  else el.innerHTML=renderWeek();
+}
+
+function renderKickLog(){
+  const kicks=sg('kickLog',[]);
+  const allPct=kicks.filter(k=>k.total>0).map(k=>Math.round(k.makes/k.total*100));
+  const bestPct=allPct.length?Math.max(...allPct):0;
+  const bestDist=kicks.length?Math.max(...kicks.map(k=>k.dist||0)):0;
+  const cons=calcConsecutive(kicks);
+  const recent=kicks.slice().reverse().slice(0,15);
+
+  return`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+  <div class="lbl">PERSONAL BESTS</div>
+  <button class="btn btn-acc btn-sm" onclick="openModal('kick-modal')">+ LOG SESSION</button>
+</div>
+<div class="pb-grid">
+  <div class="pb-card"><div class="pb-val">${bestPct}%</div><div class="pb-lbl">BEST SESSION %</div></div>
+  <div class="pb-card"><div class="pb-val">${bestDist}m</div><div class="pb-lbl">LONGEST KICK</div></div>
+  <div class="pb-card"><div class="pb-val">${kicks.length}</div><div class="pb-lbl">SESSIONS</div></div>
+  <div class="pb-card"><div class="pb-val">${cons}</div><div class="pb-lbl">CONSEC. MAKES</div></div>
+</div>
+${kicks.length>0?`
+<div class="lbl" style="margin-bottom:8px;">RECENT SESSIONS</div>
+${recent.map(k=>`<div class="kle">
+  <div class="kle-pct">${Math.round(k.makes/k.total*100)}%</div>
+  <div class="kle-det">
+    <div class="kle-date">${k.date} · ${k.type} · ${k.cond}</div>
+    <div class="kle-type">${k.makes}/${k.total} makes${k.dist?` · ${k.dist}m max`:''}${k.conf?` · Conf: ${k.conf}/5`:''}</div>
+    ${k.notes?`<div class="kle-note">${k.notes}</div>`:''}
+  </div>
+</div>`).join('')}
+<button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="clearKicks()">CLEAR ALL LOGS</button>
+`:`<div style="text-align:center;padding:32px 0;color:var(--txt3);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.08em;">NO SESSIONS LOGGED YET<br>TAP + LOG SESSION TO START</div>`}`;
+}
+
+function calcConsecutive(kicks){
+  let max=0,cur=0;
+  kicks.forEach(k=>{if(k.makes===k.total&&k.total>0)cur++;else cur=0;max=Math.max(max,cur)});
+  return max;
+}
+function clearKicks(){if(confirm('Clear all kicking logs?')){ss('kickLog',[]);renderLogTab();toast('Logs cleared')}}
+
+function renderMonLog(){
+  const mons=sg('monLogs',[]).slice().reverse().slice(0,14);
+  return`
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+  <div class="lbl">MONITORING LOG</div>
+  <button class="btn btn-acc btn-sm" onclick="openModal('mon-modal')">+ CHECK IN</button>
+</div>
+${mons.length>0?mons.map(m=>{
+  const hsCl={g:'tag-g',y:'tag-y',r:'tag-r'}[m.hs]||'';
+  const hsLbl={g:'CLEAR',y:'TIGHT',r:'PAIN'}[m.hs]||'—';
+  return`<div class="kle">
+    <div style="min-width:38px;text-align:center;">
+      <div class="lbl" style="font-size:8px;">${m.date.slice(5)}</div>
+      <span class="tag ${hsCl}" style="font-size:9px;padding:2px 5px;">${hsLbl}</span>
+    </div>
+    <div class="kle-det">
+      <div class="kle-type">Fatigue: ${m.fat||'—'}/5  ·  Sleep: ${m.slp||'—'}/5</div>
+      ${m.notes?`<div class="kle-note">${m.notes}</div>`:''}
+    </div>
+  </div>`;
+}).join(''):`<div style="text-align:center;padding:32px 0;color:var(--txt3);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.08em;">NO CHECK-INS YET</div>`}`;
+}
+
+function renderWeek(){
+  const days=['M','T','W','T','F','S','S'];
+  const kicks=sg('kickLog',[]);const mons=sg('monLogs',[]);
+  const now=new Date();const dow=now.getDay();
+  const monOffset=dow===0?6:dow-1;
+  const weekDates=Array.from({length:7},(_,i)=>{
+    const d=new Date(now);d.setDate(now.getDate()-monOffset+i);
+    return d.toISOString().slice(0,10);
+  });
+  const fdone=sg('fieldDone',{});const checks=sg('dailyChecks',{});
+  return`
+<div class="lbl" style="margin-bottom:10px;">THIS WEEK</div>
+<div class="week-grid">
+  ${weekDates.map((d,i)=>{
+    const td=d===today();
+    const mon=mons.find(m=>m.date===d);
+    const hs=mon?.hs;
+    const cls=hs==='g'?'has-g':hs==='y'?'has-y':hs==='r'?'has-r':'';
+    const chk=checks[d]||{};const cdone=DAILY.filter(it=>chk[it.id]).length;
+    return`<div class="wd ${cls} ${td?'today-hl':''}">
+      <div class="wd-day">${days[i]}</div>
+      <div>${cdone>0?cdone:''}</div>
+    </div>`;
+  }).join('')}
+</div>
+<div style="display:flex;gap:10px;margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--txt2);">
+  <span style="color:var(--grn);">■</span> CLEAR&nbsp;&nbsp;<span style="color:var(--yel);">■</span> TIGHT&nbsp;&nbsp;<span style="color:var(--red);">■</span> PAIN&nbsp;&nbsp;Numbers = daily checks done
+</div>
+<div class="lbl" style="margin-bottom:8px;">THIS WEEK'S KICKING</div>
+${weekDates.map(d=>{const ks=kicks.filter(k=>k.date===d);return ks.length?ks.map(k=>`<div class="kle"><div class="kle-pct">${Math.round(k.makes/k.total*100)}%</div><div class="kle-det"><div class="kle-date">${d}</div><div class="kle-type">${k.type} · ${k.makes}/${k.total}</div></div></div>`).join(''):''}).join('')||`<div style="color:var(--txt3);font-size:13px;text-align:center;padding:16px 0;">No kicking logged this week</div>`}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// KICK MODAL
+// ═══════════════════════════════════════════════════════════
+function selConf(n){kConf=n;document.querySelectorAll('#k-conf-row .sc-btn').forEach((b,i)=>b.classList.toggle('sel',i+1===n))}
+function saveKick(){
+  const makes=parseInt(document.getElementById('k-makes').value)||0;
+  const total=parseInt(document.getElementById('k-total').value)||0;
+  if(!total){toast('Enter total kicks');return}
+  const entry={date:today(),type:document.getElementById('k-type').value,makes,total,dist:parseInt(document.getElementById('k-dist').value)||0,cond:document.getElementById('k-cond').value,conf:kConf,notes:document.getElementById('k-notes').value.trim()};
+  const log=sg('kickLog',[]);log.push(entry);ss('kickLog',log);
+  closeModal('kick-modal');kConf=0;
+  document.getElementById('k-makes').value='';document.getElementById('k-total').value='';
+  document.getElementById('k-dist').value='';document.getElementById('k-notes').value='';
+  document.querySelectorAll('#k-conf-row .sc-btn').forEach(b=>b.classList.remove('sel'));
+  toast(`${makes}/${total} logged ✓`);
+  if(curView==='log')renderLogTab();
+  if(curView==='home')rHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MONITOR MODAL
+// ═══════════════════════════════════════════════════════════
+function selHS(s){hsSel=s;['g','y','r'].forEach(x=>document.getElementById('hs-'+x).className='mon-opt'+(s===x?' s'+s:''))}
+function selFat(n){fatSel=n;document.querySelectorAll('#fat-row .sc-btn').forEach((b,i)=>b.classList.toggle('sel',i+1===n))}
+function selSlp(n){slpSel=n;document.querySelectorAll('#slp-row .sc-btn').forEach((b,i)=>b.classList.toggle('sel',i+1===n))}
+function saveMon(){
+  if(!hsSel){toast('Select hamstring status');return}
+  const entry={date:today(),hs:hsSel,fat:fatSel,slp:slpSel,notes:document.getElementById('mon-notes').value.trim()};
+  const log=sg('monLogs',[]).filter(m=>m.date!==today());log.push(entry);ss('monLogs',log);
+  closeModal('mon-modal');hsSel='';fatSel=0;slpSel=0;
+  document.getElementById('mon-notes').value='';
+  toast('Check-in saved ✓');
+  if(curView==='log')renderLogTab();
+  if(curView==='home')rHome();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+rHome();
+</script>
+</body>
+</html>
